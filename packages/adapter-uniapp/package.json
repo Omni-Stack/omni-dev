@@ -1,0 +1,30 @@
+{
+  "name": "@omni-dev/adapter-uniapp",
+  "type": "module",
+  "version": "0.0.0",
+  "private": "true",
+  "description": "Uniapp Adapter",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub"
+  },
+  "peerDependencies": {
+    "@omni-dev/base": "workspace:^",
+    "@dcloudio/types": "catalog:uniapp",
+    "@dcloudio/uni-app": "catalog:uniapp",
+    "vue": "catalog:uniapp"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "unbuild": "catalog:"
+  }
+}
