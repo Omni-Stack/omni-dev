@@ -3,7 +3,12 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "dev:lib": "bun --filter './packages/**' --parallel dev",
+    "build:lib": "bun --filter './packages/**' --parallel build",
+    "prepare": "bun build:lib",
+    "clear-all": "bun x rimraf@5 -g **/node_modules"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
