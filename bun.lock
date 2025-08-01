@@ -14,7 +14,7 @@
     },
     "packages/adapter-uniapp": {
       "name": "@omni-dev/adapter-uniapp",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "devDependencies": {
         "typescript": "catalog:",
         "unbuild": "catalog:",
@@ -28,7 +28,7 @@
     },
     "packages/base": {
       "name": "@omni-dev/base",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "@omni-dev/utils": "workspace:^",
       },
@@ -47,7 +47,7 @@
     },
     "packages/core": {
       "name": "@omni-dev/core",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "@omni-dev/types": "workspace:^",
       },
@@ -58,7 +58,7 @@
     },
     "packages/enum": {
       "name": "@omni-dev/enum",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "devDependencies": {
         "typescript": "catalog:",
         "unbuild": "catalog:",
@@ -66,7 +66,7 @@
     },
     "packages/i18n": {
       "name": "@omni-dev/i18n",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "devDependencies": {
         "typescript": "catalog:",
         "unbuild": "catalog:",
@@ -74,11 +74,11 @@
     },
     "packages/types": {
       "name": "@omni-dev/types",
-      "version": "0.0.0",
+      "version": "0.0.1",
     },
     "packages/utils": {
       "name": "@omni-dev/utils",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "devDependencies": {
         "typescript": "catalog:",
         "unbuild": "catalog:",
