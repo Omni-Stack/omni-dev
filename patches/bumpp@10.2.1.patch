@@ -1,0 +1,19 @@
+diff --git a/dist/shared/bumpp.QyItIQce.mjs b/dist/shared/bumpp.QyItIQce.mjs
+index e48f308c7bfc0471bc7c7a492dbdf81a51afff47..e1f6b3c65a74ce997738e07ee5aae3ba694f3b35 100644
+--- a/dist/shared/bumpp.QyItIQce.mjs
++++ b/dist/shared/bumpp.QyItIQce.mjs
+@@ -6709,7 +6709,13 @@ async function normalizeOptions(raw) {
+     }
+     if (fs.existsSync("package.json")) {
+       const packageJson = await fs$1.readFile("package.json", "utf8").then(JSON.parse);
+-      workspaces.push(...packageJson.workspaces ?? []);
++	  const _workspaces
++        = Array.isArray(packageJson.workspaces)
++          ? packageJson.workspaces
++          : packageJson.workspaces && Array.isArray(packageJson.workspaces.packages)
++            ? packageJson.workspaces.packages
++            : []
++      workspaces.push(..._workspaces);
+     }
+     const workspacesWithPackageJson = workspaces.map((workspace) => `${workspace}/package.json`);
+     const withoutExcludedWorkspaces = workspacesWithPackageJson.filter((workspace) => !workspace.startsWith("!") && !raw.files?.includes(workspace));

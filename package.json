@@ -2,15 +2,18 @@
   "name": "omni-dev",
   "module": "index.ts",
   "type": "module",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "dev:lib": "bun --filter './packages/**' --parallel dev",
     "build:lib": "bun --filter './packages/**' --parallel build",
     "prepare": "bun build:lib",
-    "clear-all": "bun x rimraf@5 -g **/node_modules"
+    "clear-all": "bun x rimraf@5 -g **/node_modules",
+    "bump": "bumpp -r --all --execute \"bun run ./scripts/bump-version.ts\""
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "bumpp": "^10.2.1"
   },
   "peerDependencies": {
     "typescript": "catalog:"
@@ -54,5 +57,8 @@
         "vue": "3.4.21"
       }
     }
+  },
+  "patchedDependencies": {
+    "bumpp@10.2.1": "patches/bumpp@10.2.1.patch"
   }
 }
