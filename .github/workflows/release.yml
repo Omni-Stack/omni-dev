@@ -1,0 +1,167 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - 'v*'  # 监听以 v 开头的 tag
+
+jobs:
+  build:
+    name: 构建并发版
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取完整历史以生成 notes
+
+      - name: 获取当前和上一个标签
+        id: get_tags
+        run: |
+          # 上面 `fetch-depth: 0` , 已经是完整的记录了
+          # [INFO] 这里的 fetch 不能用 --unshallow 参数了, 否则会报错: `fatal: --unshallow on a complete repository does not make sense`
+          git fetch --prune
+          tags=($(git tag -l --sort=-version:refname))
+          current_tag=${tags[0]}
+          previous_tag=${tags[1]}
+          echo "previous_tag=$previous_tag" >> $GITHUB_OUTPUT
+          echo "current_tag=$current_tag" >> $GITHUB_OUTPUT
+
+      - name: 提取并分类提交消息
+        id: extract_commit_messages
+        run: |
+          set -e
+          current_tag="${{ steps.get_tags.outputs.current_tag }}"
+          previous_tag="${{ steps.get_tags.outputs.previous_tag }}"
+          if [ -z "$previous_tag" ]; then
+            commit_messages=$(git log --pretty=format:"%s - by @%an (%h)" "$current_tag" | grep -E 'feat|fix|docs|perf|refactor|chore' || true)
+          else
+            commit_messages=$(git log --pretty=format:"%s - by @%an (%h)" "$previous_tag".."$current_tag" | grep -E 'feat|fix|docs|perf|refactor|chore' || true)
+          fi
+
+          # 转义 ` 字符
+          commit_messages=$(echo "$commit_messages" | sed 's/`/\\\`/g')
+
+          {
+            echo 'feat_messages<<EOF'
+            echo "$commit_messages" | grep 'feat' || true
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+          {
+            echo 'fix_messages<<EOF'
+            echo "$commit_messages" | grep 'fix' || true
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+          {
+            echo 'docs_messages<<EOF'
+            echo "$commit_messages" | grep 'docs' || true
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+          {
+            echo 'perf_messages<<EOF'
+            echo "$commit_messages" | grep 'perf' || true
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+          {
+            echo 'refactor_messages<<EOF'
+            echo "$commit_messages" | grep 'refactor' || true
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+          {
+            echo 'chore_messages<<EOF'
+            echo "$commit_messages" | grep 'chore' || true
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+
+      - name: 获取当前分支名
+        id: get_branch_name
+        run: |
+          branch_name=$(git rev-parse --abbrev-ref HEAD)
+          echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
+
+      - name: 发版详情
+        id: generate_release_notes_content
+        run: |
+          # 获取 tag 信息
+          current_tag="${{ steps.get_tags.outputs.current_tag }}"
+          previous_tag="${{ steps.get_tags.outputs.previous_tag }}"
+
+          # 提取提交消息分类
+          feat_messages=("${{ steps.extract_commit_messages.outputs.feat_messages }}")
+          fix_messages=("${{ steps.extract_commit_messages.outputs.fix_messages }}")
+          docs_messages=("${{ steps.extract_commit_messages.outputs.docs_messages }}")
+          perf_messages=("${{ steps.extract_commit_messages.outputs.perf_messages }}")
+          refactor_messages=("${{ steps.extract_commit_messages.outputs.refactor_messages }}")
+          chore_messages=("${{ steps.extract_commit_messages.outputs.chore_messages }}")
+
+          release_notes=""
+
+          # 添加详细 commit 记录链接
+          if [ -z "$previous_tag" ]; then
+            release_notes="$release_notes\n### 🔍 详细更新记录\n查看 [$current_tag 完整更新记录](https://github.com/${{ github.repository }}/compare/$current_tag)  \n\n"
+          else
+            release_notes="$release_notes\n### 🔍 详细更新记录\n查看 [$previous_tag → $current_tag 完整更新记录](https://github.com/${{ github.repository }}/compare/$previous_tag...$current_tag)  \n\n"
+          fi
+
+          if [[ -n "$feat_messages" ]]; then
+            release_notes="$release_notes\n### 🚀 Features 新功能:  \n"
+            while IFS= read -r message; do
+              release_notes="$release_notes\n- $message"
+            done <<< "$feat_messages"
+          fi
+
+          if [[ -n "$fix_messages" ]]; then
+            release_notes="$release_notes\n### 🩹 Fixes 缺陷修复:  \n"
+            while IFS= read -r message; do
+              release_notes="$release_notes\n- $message"
+            done <<< "$fix_messages"
+          fi
+
+          if [[ -n "$docs_messages" ]]; then
+            release_notes="$release_notes\n### 📖 Documentation 文档:  \n"
+            while IFS= read -r message; do
+              release_notes="$release_notes\n- $message"
+            done <<< "$docs_messages"
+          fi
+
+          if [[ -n "$perf_messages" ]]; then
+            release_notes="$release_notes\n### 🔥 Performance 性能优化:  \n"
+            while IFS= read -r message; do
+              release_notes="$release_notes\n- $message"
+            done <<< "$perf_messages"
+          fi
+
+          if [[ -n "$refactor_messages" ]]; then
+            release_notes="$release_notes\n### ♻️ Refactor 代码重构:  \n"
+            while IFS= read -r message; do
+              release_notes="$release_notes\n- $message"
+            done <<< "$refactor_messages"
+          fi
+
+          if [[ -n "$chore_messages" ]]; then
+            release_notes="$release_notes\n### 📦 Chore 杂务:  \n"
+            while IFS= read -r message; do
+              release_notes="$release_notes\n- $message"
+            done <<< "$chore_messages"
+          fi
+
+          # 转义 ` 字符
+          release_notes=$(echo "$release_notes" | sed 's/`/\\\`/g')
+          echo "release_notes=$release_notes" >> $GITHUB_OUTPUT
+
+      - name: 写入生成的发布说明到 changelog.md
+        run: |
+          echo -e "${{ steps.generate_release_notes_content.outputs.release_notes }}" > changelog.md
+          echo "--- Changelog Content ---"
+          cat changelog.md
+          echo "-------------------------"
+
+      - name: 引用 changelog.md 创建发版
+        id: release_tag
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          bodyFile: changelog.md
