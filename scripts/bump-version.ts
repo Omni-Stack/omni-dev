@@ -7,11 +7,11 @@ import { parse, modify, applyEdits } from 'jsonc-parser'
  */
 async function main() {
   // 生成 changelog
-  // const { exitCode, stderr } = await $`bun -b changelog`
-  // if (exitCode) {
-  //   console.error(stderr)
-  //   process.exit(exitCode)
-  // }
+  const { exitCode, stderr } = await $`bun -b changelog`
+  if (exitCode) {
+    console.error(stderr)
+    process.exit(exitCode)
+  }
 
   // 更新 bun.lock 中的 workspace 版本
   try {
