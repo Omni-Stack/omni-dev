@@ -14,13 +14,13 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "unbuild",
-    "dev": "unbuild --stub",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "test": "vitest"
   },
   "devDependencies": {
     "typescript": "catalog:",
-    "unbuild": "catalog:",
+    "tsdown": "catalog:",
     "vitest": "catalog:"
   }
 }

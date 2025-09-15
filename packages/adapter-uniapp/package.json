@@ -14,8 +14,8 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "unbuild",
-    "dev": "unbuild --stub"
+    "build": "tsdown",
+    "dev": "tsdown --watch"
   },
   "peerDependencies": {
     "@omni-dev/base": "workspace:^",
@@ -25,6 +25,6 @@
   },
   "devDependencies": {
     "typescript": "catalog:",
-    "unbuild": "catalog:"
+    "tsdown": "catalog:"
   }
 }
