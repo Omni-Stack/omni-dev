@@ -8,7 +8,7 @@
     "dev:lib": "bun --filter './packages/**' --parallel dev",
     "build:lib": "bun --filter './packages/**' --parallel build",
     "prepare": "bun build:lib",
-    "clear-all": "bun x rimraf@5 -g **/node_modules",
+    "clear-all": "bun x rimraf@5 -g **/node_modules **/dist",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
     "bump": "bumpp -r --all --execute \"bun run ./scripts/bump-version.ts\""
   },
